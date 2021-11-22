@@ -1,0 +1,50 @@
+{
+  // See https://go.microsoft.com/fwlink/?LinkId=733558
+  // for the documentation about the tasks.json format
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Create Build dir",
+      "type": "shell",
+      "options": {},
+      "command": "mkdir",
+      "args": ["-p", "${workspaceRoot}/build/${command:cmake.buildType}"],
+      "dependsOn": [],
+      "problemMatcher": [],
+      "group": "build",
+      "presentation": {
+        "reveal": "silent",
+        "close": true
+      },
+    },
+    {
+      "label": "CMake config",
+      "type": "shell",
+      "options": {
+        "cwd": "${workspaceRoot}/build/${command:cmake.buildType}"
+      },
+      "command": "cmake",
+      "args": [
+        "-DCMAKE_BUILD_TYPE=${command:cmake.buildType}", 
+        "${workspaceFolder}", 
+        "-DCMAKE_TOOLCHAIN_FILE=${workspaceFolder}/cmake/default-toolchain.cmake" // default
+        //"-DCMAKE_TOOLCHAIN_FILE=${workspaceFolder}/cmake/android-aarch64-toolchain.cmake" // aarch64
+      ],
+      "dependsOn": ["Create Build dir"],
+      "problemMatcher": [],
+      "group": "build",
+    },
+    {
+      "label": "make build",
+      "type": "shell",
+      "options": {
+        "cwd": "${workspaceRoot}/build/${command:cmake.buildType}"
+      },
+      "command": "make",
+      "args": ["-j$((`nproc`+1))"],
+      "dependsOn": ["Create Build dir", "CMake config"],
+      "problemMatcher": [],
+      "group": "build",
+    }
+  ]
+}
