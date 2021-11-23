@@ -15,42 +15,43 @@ limitations under the License.
 */
 
 #include <stdio.h>
-#include "platform.h"  // [NOLINT]
+#include "platform.h"
 
-#if defined(_WIN32)    // Windows (x86)
+#if defined(_WIN32)    /* Windows (x86) */
 # define PLATFORM_NAME "windows"
-#elif defined(_WIN64)  // Windows (x64)
+#elif defined(_WIN64)  /* Windows (x86) */
 # define PLATFORM_NAME "windows"
-#elif defined(__CYGWIN__) && !defined(_WIN32)  // Cygwin POSIX under MS Window
+#elif defined(__CYGWIN__) && !defined(_WIN32)  /* Cygwin POSIX under Windows */
 # define PLATFORM_NAME "windows"
-#elif defined(__ANDROID__)  // Android (implies Linux, so it must come first)
+#elif defined(__ANDROID__)  /* Android (implies Linux, so it must come first) */
 # define PLATFORM_NAME "android"
-#elif defined(__linux__)  // Debian, Ubuntu, Fedora, RedHat, CentOS, etc.
+#elif defined(__linux__)  /* Debian, Ubuntu, Fedora, RedHat, CentOS, etc. */
 # define PLATFORM_NAME "linux"
 #elif defined(__unix__) || !defined(__APPLE__) && defined(__MACH__)
 # include <sys/param.h>
-# if defined(BSD)  // FreeBSD, NetBSD, OpenBSD, DragonFly BSD
+# if defined(BSD)  /* FreeBSD, NetBSD, OpenBSD, DragonFly BSD */
 #  define PLATFORM_NAME "bsd"
-# endif
-#elif defined(__hpux)  // HP-UX
+# endif  /* BSD */
+#elif defined(__hpux)  /* HP-UX */
 # define PLATFORM_NAME "hp-ux"
-#elif defined(_AIX)  // IBM AIX
+#elif defined(_AIX)  /* IBM AIX */
 # define PLATFORM_NAME "aix"
-#elif defined(__APPLE__) && defined(__MACH__)  // Apple OSX and iOS (Darwin)
+#elif defined(__APPLE__) && defined(__MACH__)  /* Apple OSX and iOS (Darwin) */
 # include <TargetConditionals.h>
-# if TARGET_IPHONE_SIMULATOR == 1  // Apple iOS (~iOS 9.0)
+# if TARGET_IPHONE_SIMULATOR == 1  /* Apple iOS (~iOS 9.0) */
 #  define PLATFORM_NAME "ios"
-# elif TARGET_OS_IPHONE == 1       // Apple iOS
+# elif TARGET_OS_IPHONE == 1       /* Apple iOS */
 #  define PLATFORM_NAME "ios"
-# elif TARGET_OS_MAC == 1          // Apple OSX
+# elif TARGET_OS_MAC == 1          /* Apple OSX */
 #  define PLATFORM_NAME "osx"
-# endif
-#elif defined(__sun) && defined(__SVR4)  // Oracle Solaris, Open Indiana
+# endif  /* TARGET_OS_MAC */
+#elif defined(__sun) && defined(__SVR4)  /* Oracle Solaris, Open Indiana */
 # define PLATFORM_NAME "solaris"
-#else
+#else   /* !__sun || !__SVR4 */
 # define PLATFORM_NAME NULL
-#endif
+#endif  /* !__sun || !__SVR4 */
 
-const char* GetPlatformName() {
+const char* GetPlatformName() 
+{
   return ((PLATFORM_NAME == NULL) ? "" : PLATFORM_NAME);
 }

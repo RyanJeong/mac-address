@@ -21,7 +21,7 @@ limitations under the License.
 
 #ifdef __cplusplus
 extern "C" {
-#endif  // __cplusplus
+#endif  /* __cplusplus */
 
 /**
  * @brief 
@@ -31,5 +31,5 @@ const char* GetPlatformName();
 
 #ifdef __cplusplus
 }
-#endif  // __cplusplus
-#endif  // LIB_PLATFORM_H_
+#endif  /* __cplusplus */
+#endif  /* LIB_PLATFORM_H_ */
