@@ -22,19 +22,11 @@ limitations under the License.
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <errno.h>
 #include <assert.h>
 
 #include <unistd.h>
-#include <sys/types.h>
-#include <sys/socket.h>
 #include <sys/ioctl.h>
-#include <sys/resource.h>
 #include <sys/utsname.h>
-#include <netdb.h>
-#include <netinet/in.h>
-#include <netinet/in_systm.h>
-#include <netinet/ip.h>
 #include <netinet/ip_icmp.h>
 
 #ifdef DARWIN
@@ -43,7 +35,6 @@ limitations under the License.
 # include <net/if_types.h>
 #else  /* !DARWIN */
 # include <linux/if.h>
-# include <linux/sockios.h>
 #endif  /* !DARWIN */
 
 typedef struct MacAddrWithHash {

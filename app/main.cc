@@ -39,7 +39,7 @@ int main(void) {
 
   MacAddrWithHash *list_mac_hash = GetMacHash();
   MacAddrWithHash *it = list_mac_hash;
-  for (int i = 1; it = it->p_next; ++i) {
+  for (int i = 1; (it = it->p_next); ++i) {
     std::cout << "MAC Address #" << i << " Hash: "
               << it->mac_hash << '\n';
   }
