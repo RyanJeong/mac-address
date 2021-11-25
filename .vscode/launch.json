@@ -15,6 +15,20 @@
             "preLaunchTask": "make build",
             "miDebuggerPath": "/usr/bin/gdb",
             "additionalSOLibSearchPath": "${workspaceFolder}/build/${command:cmake.buildType}/core;/lib64;/usr/lib",
+        },
+        {
+            "name": "clang++ - Build and debug for Mac",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/${command:cmake.buildType}/app/program",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "lldb",
+            "preLaunchTask": "make build",
+            "additionalSOLibSearchPath": "${workspaceFolder}/build/${command:cmake.buildType}/core;/lib64;/usr/lib",
         }
     ]
 }

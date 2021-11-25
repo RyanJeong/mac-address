@@ -37,6 +37,12 @@ const char *GetMachineName()
 unsigned short GetCpuHash()
 {
   const NXArchInfo *cpu_info = NXGetLocalArchInfo();
+
+  printf("Processor Info: type: %u, subtype: %u, "
+         "description: %s, name: %s\n", cpu_info->cputype,
+                                        cpu_info->cpusubtype,
+                                        cpu_info->description,
+                                        cpu_info->name);
   unsigned short hash = 0;
   hash += (unsigned short) cpu_info->cputype;
   hash += (unsigned short) cpu_info->cpusubtype;
@@ -129,7 +135,7 @@ MacAddrWithHash *GetMacHash()
   if (getifaddrs(&ifaphead) != 0) {
     assert(0);  /* Shouldn't throw an exception */
 
-    return;
+    return NULL;
   }
   MacAddrWithHash *p_head;
   MacAddrWithHash *p_tail;
@@ -137,9 +143,6 @@ MacAddrWithHash *GetMacHash()
   p_head = (MacAddrWithHash *) malloc(sizeof(MacAddrWithHash));
   p_head->p_next = NULL;
   p_tail = p_head;
-
-  /* TODO */
-  /* iterate over the net interfaces */
   struct ifaddrs *ifap;
   for (ifap = ifaphead; ifap; ifap = ifap->ifa_next) {
     struct sockaddr_dl *sdl = (struct sockaddr_dl *) ifap->ifa_addr;
@@ -147,11 +150,36 @@ MacAddrWithHash *GetMacHash()
     AF_LINK: the link layer(Ethernet) interface
     IFT_ETHER: Ethernet I or II (also known as DIX Ethernet)
     */
-    if (sdl && (sdl->sdl_family == AF_LINK) && (sdl->sdl_type == IFT_ETHER)) {
-      /* TODO
-      mac = HashMacAddress( (unsigned char*)(LLADDR(sdl)));
-      */
+    if (!sdl) {
+      continue;
     }
+
+    if (sdl->sdl_family != AF_LINK) {
+      continue;
+    }
+
+    if (sdl->sdl_type != IFT_ETHER) {
+      continue;
+    }
+
+    MacAddrWithHash *p_tmp;
+
+    p_tmp = (MacAddrWithHash *) malloc(sizeof(MacAddrWithHash));
+    p_tmp->p_next = NULL;
+# ifndef NDEBUG
+    static int cnt = 1;
+    unsigned char mac_addr[6];
+    memcpy(mac_addr, LLADDR(sdl), 6);
+    printf("MAC Address #%d: ", cnt++);
+    for (int i = 0; i < 6; ++i) {
+      printf("%02X%s", mac_addr[i], ((i == 5) ? "" : ":"));
+    }
+    putchar('\n');
+# endif  /* NDEBUG */
+    p_tmp->mac_hash = HashMacAddress(
+        (unsigned char *) LLADDR(sdl));
+    p_tail->p_next = p_tmp;
+    p_tail = p_tmp;
   }
   freeifaddrs(ifaphead);
 #elif defined(SYSTEM_INFO_LINUX)
@@ -197,26 +225,28 @@ MacAddrWithHash *GetMacHash()
       continue;
     }
 
-    if (ioctl(sock, SIOCGIFHWADDR, ifr) == 0) {
-      MacAddrWithHash *p_tmp;
-
-      p_tmp = (MacAddrWithHash *) malloc(sizeof(MacAddrWithHash));
-      p_tmp->p_next = NULL;
-# ifndef NDEBUG
-      static int cnt = 1;
-      unsigned char mac_addr[6];
-      memcpy(mac_addr, &(ifr->ifr_addr.sa_data), 6);
-      printf("MAC Address #%d: ", cnt++);
-      for (int i = 0; i < 6; ++i) {
-        printf("%02X%s", mac_addr[i], ((i == 5) ? "" : ":"));
-      }
-      putchar('\n');
-# endif  /* NDEBUG */
-      p_tmp->mac_hash = HashMacAddress(
-          (unsigned char *) &(ifr->ifr_addr.sa_data));
-      p_tail->p_next = p_tmp;
-      p_tail = p_tmp;
+    if (ioctl(sock, SIOCGIFHWADDR, ifr)) {
+      continue;
     }
+
+    MacAddrWithHash *p_tmp;
+
+    p_tmp = (MacAddrWithHash *) malloc(sizeof(MacAddrWithHash));
+    p_tmp->p_next = NULL;
+# ifndef NDEBUG
+    static int cnt = 1;
+    unsigned char mac_addr[6];
+    memcpy(mac_addr, &(ifr->ifr_addr.sa_data), 6);
+    printf("MAC Address #%d: ", cnt++);
+    for (int i = 0; i < 6; ++i) {
+      printf("%02X%s", mac_addr[i], ((i == 5) ? "" : ":"));
+    }
+    putchar('\n');
+# endif  /* NDEBUG */
+    p_tmp->mac_hash = HashMacAddress(
+        (unsigned char *) &(ifr->ifr_addr.sa_data));
+    p_tail->p_next = p_tmp;
+    p_tail = p_tmp;
   }
   close(sock);
 #endif  /* SYSTEM_INFO_LINUX */

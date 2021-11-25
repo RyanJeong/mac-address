@@ -67,8 +67,10 @@ limitations under the License.
 # elif TARGET_OS_MAC == 1          /* Apple OSX */
 #  define SYSTEM_INFO_MAC
 #  include <net/if_dl.h>
-#  include <ifaddrs.h>
 #  include <net/if_types.h>
+#  include <ifaddrs.h>
+#  include <sys/socket.h>
+#  include <sys/utsname.h>
 # endif  /* TARGET_OS_MAC */
 #elif defined(__sun) && defined(__SVR4)  /* Oracle Solaris, Open Indiana */
 #  define SYSTEM_INFO_SOLARIS_INDIANA
