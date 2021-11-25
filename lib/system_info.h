@@ -24,18 +24,58 @@ limitations under the License.
 #include <stdlib.h>
 #include <assert.h>
 
-#include <unistd.h>
-#include <sys/ioctl.h>
-#include <sys/utsname.h>
-#include <netinet/ip_icmp.h>
-
-#ifdef DARWIN
-# include <net/if_dl.h>
-# include <ifaddrs.h>
-# include <net/if_types.h>
-#else  /* !DARWIN */
+#if defined(_WIN32)    /* Windows (x86) */
+/* [WIP] not yet checked */
+# define SYSTEM_INFO_WIN32
+#elif defined(_WIN64)  /* Windows (x86) */
+/* [WIP] not yet checked */
+# define SYSTEM_INFO_WIN64
+#elif defined(__CYGWIN__) && !defined(_WIN32)  /* Cygwin POSIX under Windows */
+/* [WIP] not yet checked */
+# define SYSTEM_INFO_CYGWIN
+#elif defined(__ANDROID__)  /* Android (implies Linux, so it must come first) */
+/* [WIP] not yet checked */
+# define SYSTEM_INFO_ANDROID
+#elif defined(__linux__)  /* Debian, Ubuntu, Fedora, RedHat, CentOS, etc. */
+# define SYSTEM_INFO_LINUX
+# include <unistd.h>
+# include <sys/ioctl.h>
+# include <sys/utsname.h>
+# include <netinet/in.h>
+# include <netinet/ip_icmp.h>
 # include <linux/if.h>
-#endif  /* !DARWIN */
+#elif defined(__unix__) || !defined(__APPLE__) && defined(__MACH__)
+# include <sys/param.h>
+# if defined(BSD)  /* FreeBSD, NetBSD, OpenBSD, DragonFly BSD */
+#  define SYSTEM_INFO_BSD
+/* [WIP] not yet checked */
+# endif  /* BSD */
+#elif defined(__hpux)  /* HP-UX */
+# define SYSTEM_INFO_HP_UX
+/* [WIP] not yet checked */
+#elif defined(_AIX)  /* IBM AIX */
+# define SYSTEM_INFO_IBM_AIX
+/* [WIP] not yet checked */
+#elif defined(__APPLE__) && defined(__MACH__)  /* Apple OSX and iOS (Darwin) */
+# include <TargetConditionals.h>
+# if TARGET_IPHONE_SIMULATOR == 1  /* Apple iOS (~iOS 9.0) */
+#  define SYSTEM_INFO_IOS
+/* [WIP] not yet checked */
+# elif TARGET_OS_IPHONE == 1       /* Apple iOS */
+#  define SYSTEM_INFO_IOS_9
+/* [WIP] not yet checked */
+# elif TARGET_OS_MAC == 1          /* Apple OSX */
+#  define SYSTEM_INFO_MAC
+#  include <net/if_dl.h>
+#  include <ifaddrs.h>
+#  include <net/if_types.h>
+# endif  /* TARGET_OS_MAC */
+#elif defined(__sun) && defined(__SVR4)  /* Oracle Solaris, Open Indiana */
+#  define SYSTEM_INFO_SOLARIS_INDIANA
+/* [WIP] not yet checked */
+#else   /* NULL */
+/* Nothing */
+#endif  /* NULL */
 
 typedef struct MacAddrWithHash {
   unsigned int mac_hash;
@@ -58,7 +98,7 @@ const char *GetMachineName();
  */
 unsigned short GetCpuHash();
 
-#ifndef DARWIN
+#ifdef SYSTEM_INFO_LINUX
 /**
  * @brief 
  * - a function that store the result of the `cpuid` instruction with eax 0 
@@ -68,7 +108,7 @@ unsigned short GetCpuHash();
  * - https://en.wikipedia.org/wiki/CPUID#EAX=0:_Highest_Function_Parameter_and_Manufacturer_ID
  */
 static void GetCpuid(unsigned int *p, unsigned int ax);
-#endif  /* !DARWIN */
+#endif  /* SYSTEM_INFO_LINUX */
 
 /**
  * @brief 

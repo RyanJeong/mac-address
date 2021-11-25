@@ -49,9 +49,9 @@ limitations under the License.
 # endif  /* TARGET_OS_MAC */
 #elif defined(__sun) && defined(__SVR4)  /* Oracle Solaris, Open Indiana */
 # define PLATFORM_NAME "solaris"
-#else   /* !__sun || !__SVR4 */
+#else   /* NULL */
 # define PLATFORM_NAME NULL
-#endif  /* !__sun || !__SVR4 */
+#endif  /* NULL */
 
 #ifdef __cplusplus
 extern "C" {

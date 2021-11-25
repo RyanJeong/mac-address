@@ -31,7 +31,7 @@ const char *GetMachineName()
   return u.nodename;
 }
 
-#ifdef DARWIN
+#if defined(SYSTEM_INFO_MAC)
 # include <mach-o/arch.h>
 
 unsigned short GetCpuHash()
@@ -43,7 +43,7 @@ unsigned short GetCpuHash()
 
   return hash;
 }
-#else  /* !DARWIN */
+#elif defined(SYSTEM_INFO_LINUX)
 unsigned short GetCpuHash()
 {
   unsigned int cpu_info[4] = { 0, 0, 0, 0 };
@@ -103,7 +103,7 @@ static void GetCpuid(unsigned int *p, unsigned int ax)
                          "=c" (p[2]), "=d" (p[3])
                        : "0" (ax));
 }
-#endif  /* !DARWIN */
+#endif  /* SYSTEM_INFO_LINUX */
 
 unsigned short GetVolumeHash()
 {
@@ -123,7 +123,7 @@ unsigned short GetVolumeHash()
 
 MacAddrWithHash *GetMacHash()
 {
-#ifdef DARWIN
+#if defined(SYSTEM_INFO_MAC)
   struct ifaddrs *ifaphead;
 
   if (getifaddrs(&ifaphead) != 0) {
@@ -154,7 +154,7 @@ MacAddrWithHash *GetMacHash()
     }
   }
   freeifaddrs(ifaphead);
-#else  /* !DARWIN */
+#elif defined(SYSTEM_INFO_LINUX)
   int sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_IP);
 
   if (sock < 0) {
@@ -219,7 +219,7 @@ MacAddrWithHash *GetMacHash()
     }
   }
   close(sock);
-#endif  /* !DARWIN */
+#endif  /* SYSTEM_INFO_LINUX */
 
   return p_head;
 }
