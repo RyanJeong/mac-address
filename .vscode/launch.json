@@ -22,13 +22,14 @@
             "request": "launch",
             "program": "${workspaceFolder}/build/${command:cmake.buildType}/app/program",
             "args": [],
-            "stopAtEntry": false,
+            "stopAtEntry": true,
             "cwd": "${workspaceFolder}",
             "environment": [],
             "externalConsole": false,
             "MIMode": "lldb",
             "preLaunchTask": "make build",
-            "additionalSOLibSearchPath": "${workspaceFolder}/build/${command:cmake.buildType}/core;/lib64;/usr/lib",
+            //  "additionalSOLibSearchPath": "${workspaceFolder}/build/${command:cmake.buildType}/core;/lib64;/usr/lib",
+          }       
         }
     ]
 }

@@ -146,21 +146,48 @@ MacAddrWithHash *GetMacHash()
   struct ifaddrs *ifap;
   for (ifap = ifaphead; ifap; ifap = ifap->ifa_next) {
     struct sockaddr_dl *sdl = (struct sockaddr_dl *) ifap->ifa_addr;
-    /*
-    AF_LINK: the link layer(Ethernet) interface
-    IFT_ETHER: Ethernet I or II (also known as DIX Ethernet)
-    */
     if (!sdl) {
       continue;
     }
 
+    // the length for an Ethernet address is six
+    if (sdl->sdl_alen != 6) {
+      continue;
+    }
+
+    // AF_LINK: the link layer(Ethernet) interface
     if (sdl->sdl_family != AF_LINK) {
       continue;
     }
 
+    // IFT_ETHER: Ethernet I or II (also known as DIX Ethernet)
     if (sdl->sdl_type != IFT_ETHER) {
       continue;
     }
+
+    // get device 'en*' only
+    if (*(sdl->sdl_data) != 'e' || *(sdl->sdl_data + 1) != 'n') {
+      continue;
+    }
+# ifndef NDEBUG
+#  ifdef NDEBUG
+    printf("sdl_alen: %u\n", sdl->sdl_alen);
+    printf("sdl_index: %u\n", sdl->sdl_index);
+    printf("sdl_type: %u\n", sdl->sdl_type);
+    printf("sdl_len: %u\n", sdl->sdl_len);
+    printf("sdl_nlen: %u\n", sdl->sdl_nlen);
+    int nlen = sdl->sdl_nlen;
+    for (int i = 0; i < sdl->sdl_len; ++i) {
+      if (nlen > 0) {
+        putchar(sdl->sdl_data[i]);
+        --nlen;
+      } else {
+        printf(" %x", sdl->sdl_data[i]);
+      }
+    }
+    putchar('\n');
+#  endif  /* NDEBUG */
+# endif  /* NDEBUG */
 
     MacAddrWithHash *p_tmp;
 
@@ -225,6 +252,7 @@ MacAddrWithHash *GetMacHash()
       continue;
     }
 
+    /* failed to get hardware address, skip it */
     if (ioctl(sock, SIOCGIFHWADDR, ifr)) {
       continue;
     }
