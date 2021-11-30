@@ -73,7 +73,7 @@ limitations under the License.
 #  include <sys/utsname.h>
 # endif  /* TARGET_OS_MAC */
 #elif defined(__sun) && defined(__SVR4)  /* Oracle Solaris, Open Indiana */
-#  define SYSTEM_INFO_SOLARIS_INDIANA
+# define SYSTEM_INFO_SOLARIS_INDIANA
 /* [WIP] not yet checked */
 #else   /* NULL */
 /* Nothing */
